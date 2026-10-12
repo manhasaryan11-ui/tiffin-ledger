@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tiffin Ledger</title>
+<meta name="theme-color" content="#3a2a8c">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f5f2fc;--card:#fff;--ink:#1a1240;--mute:#6a6490;--line:#e1dcf2;--gold:#e9a820;--steel:#3a2a8c;--ok:#0f8a6d;--bad:#c2274b;--okbg:#dff5ee;--badbg:#fde4ea;--goldbg:#fbf0d2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#100b26;--card:#1b1540;--ink:#f4f0ff;--mute:#a79fd0;--line:#2f2761;--steel:#b3a4ff;--okbg:#103a31;--badbg:#43182a;--goldbg:#3a2f12}}
+:root[data-theme="dark"]{--bg:#100b26;--card:#1b1540;--ink:#f4f0ff;--mute:#a79fd0;--line:#2f2761;--steel:#b3a4ff;--okbg:#103a31;--badbg:#43182a;--goldbg:#3a2f12}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs,17px)/1.5 "Bricolage Grotesque",system-ui,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:16px 14px 90px}
+h1{font-size:28px;font-weight:800;margin:6px 0 2px}
+.sub{color:var(--mute);margin:0 0 14px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;border:0;background:none;color:var(--mute);font-weight:600;font-size:13px;font-family:inherit;padding:8px 2px;cursor:pointer;border-top:3px solid transparent}
+nav button.on{color:var(--ink);border-top-color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-size:24px;font-weight:800}
+.stat span{color:var(--mute);font-size:13px}
+.stat.hot{background:var(--badbg)}.stat.good{background:var(--okbg)}.stat.gold{background:var(--goldbg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.card.done{border-left:5px solid var(--ok)}.card.owes{border-left:5px solid var(--bad)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.name{font-weight:800;font-size:1.2em}label{font-weight:600;font-size:.9em;display:grid;gap:4px}
+.m{color:var(--mute);font-size:14px}
+.tag{display:inline-block;font-size:13px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--goldbg)}
+.tag.bad{background:var(--badbg);color:var(--bad)}.tag.ok{background:var(--okbg);color:var(--ok)}
+button.b{font:600 .95em "Bricolage Grotesque",system-ui,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:12px 14px;cursor:pointer;min-height:48px}
+button.b.pri{background:var(--steel);color:#fff;border-color:var(--steel)}
+button.b.on{background:var(--ok);color:#fff;border-color:var(--ok)}
+button.b.gold{background:var(--gold);border-color:var(--gold);color:#241a00}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;cursor:pointer}
+.qty span{min-width:22px;text-align:center;font-weight:800;font-size:20px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+input,select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:100%}
+.form{display:grid;gap:8px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{color:var(--mute);text-align:center;padding:26px 10px;border:1px dashed var(--line);border-radius:12px}
+.date{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.date input{width:auto}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--gold)}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
+.sec{font-size:1.1em;margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+.tag{font-size:.85em;padding:4px 10px;margin:2px 4px 2px 0}
+.badges{margin-top:8px}
+.banner{background:var(--okbg);color:var(--ok);border-radius:12px;padding:14px;font-weight:800;text-align:center;margin-bottom:10px}
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+#dlg[hidden],#toast[hidden]{display:none}
+#dlg .box{background:var(--card);border-radius:14px;padding:16px;width:100%;max-width:400px;display:grid;gap:10px}
+#dlg h2{margin:0;font-size:1.15em}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:10px;font-weight:600;z-index:30;text-align:center}
+.big{flex:1}
+input[type=search]{font-size:1em}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}
+.chip{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:10px 16px;font:600 .95em inherit;font-family:inherit;cursor:pointer;min-height:44px}
+.chip.on{background:var(--gold);border-color:var(--gold);color:#241a00}
+body::before{content:"";position:fixed;inset:0 0 auto 0;height:280px;background:linear-gradient(180deg,rgba(90,67,214,.18),rgba(90,67,214,0));pointer-events:none;z-index:-1}
+h1{color:var(--steel);letter-spacing:-.02em}
+h1::after{content:"";display:block;width:58px;height:5px;border-radius:9px;margin-top:6px;background:linear-gradient(90deg,var(--gold),rgba(233,168,32,0))}
+.card{box-shadow:0 1px 2px rgba(42,28,110,.07),0 12px 28px -16px rgba(42,28,110,.4);transition:transform .2s,box-shadow .2s}
+.card:active{transform:scale(.992)}
+.stat{border-top:4px solid var(--line);box-shadow:0 1px 2px rgba(42,28,110,.07),0 12px 28px -18px rgba(42,28,110,.4)}
+.stat.gold{border-top-color:var(--gold)}.stat.good{border-top-color:var(--ok)}.stat.hot{border-top-color:var(--bad)}
+.stat b{color:var(--steel)}.stat.good b{color:var(--ok)}.stat.hot b{color:var(--bad)}
+nav{box-shadow:0 -10px 28px -14px rgba(42,28,110,.45)}
+nav button{transition:color .2s}
+nav button span{transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+nav button.on{color:var(--steel);border-top-color:var(--gold)}
+nav button.on span{transform:translateY(-2px) scale(1.18)}
+button{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button.b,.chip,.qty button{transition:transform .2s cubic-bezier(.3,1.6,.5,1),box-shadow .2s,background .2s}
+button.b:active,.chip:active,.qty button:active{transform:scale(.92)}
+button.b.pri,.chip.on{background:linear-gradient(135deg,#5a43d6,#2f1f80);border-color:#2f1f80;color:#fff;box-shadow:0 8px 18px -8px rgba(47,31,128,.85)}
+button.b.on{background:linear-gradient(135deg,#17a583,#0f8a6d);border-color:#0f8a6d;color:#fff}
+button.b.gold{background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 72%,#fff),var(--gold));border-color:var(--gold);color:#241a00;font-weight:800}
+.banner{background:linear-gradient(110deg,var(--okbg) 30%,rgba(255,255,255,.65) 50%,var(--okbg) 70%);background-size:240% 100%;border:1px solid var(--ok)}
+.rp{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:rp .6s ease-out forwards;pointer-events:none}
+.cf{position:fixed;z-index:50;pointer-events:none;border-radius:2px}
+@keyframes rp{to{transform:scale(1);opacity:0}}
+@media (prefers-reduced-motion:no-preference){
+.enter .card,.enter .stat,.enter .chip,.enter .banner,.enter .sec,.enter .tx{animation:rise .6s cubic-bezier(.2,.9,.3,1.15) both;animation-delay:var(--d,0ms)}
+.enter h1::after{animation:grow .9s .1s ease-out both}
+.card.pop{animation:popin .7s cubic-bezier(.2,1.4,.4,1),ring 1.1s ease-out}
+.card.pop .tag{animation:tagIn .5s cubic-bezier(.3,1.7,.5,1) both}
+.qty span.bump{animation:bump .45s cubic-bezier(.3,1.8,.5,1)}
+nav button.hop span{animation:hop .55s cubic-bezier(.3,1.8,.5,1)}
+#dlg{animation:fade .2s ease-out}
+#dlg .box{animation:dlgIn .4s cubic-bezier(.2,1.3,.4,1)}
+#toast{animation:toastIn .45s cubic-bezier(.2,1.5,.4,1)}
+.banner{animation:shine 3.2s linear infinite}
+.empty{animation:floaty 3.4s ease-in-out infinite}
+.b.pri.big::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-20deg);animation:sheen 4.6s ease-in-out infinite}
+@keyframes rise{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes grow{from{width:0}}
+@keyframes popin{0%{transform:scale(.94)}50%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(15,138,109,.6)}100%{box-shadow:0 0 0 24px rgba(15,138,109,0)}}
+@keyframes tagIn{from{opacity:0;transform:scale(.4) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes bump{0%{transform:scale(.5) translateY(10px);opacity:.3}60%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes hop{0%{transform:translateY(8px) scale(.7)}60%{transform:translateY(-9px) scale(1.32)}100%{transform:translateY(-2px) scale(1.18)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes dlgIn{from{opacity:0;transform:translateY(34px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateY(26px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes shine{from{background-position:120% 0}to{background-position:-120% 0}}
+@keyframes floaty{50%{transform:translateY(-6px)}}
+@keyframes sheen{0%,60%{left:-60%}100%{left:130%}}
+}
+#dlg{top:auto;bottom:calc(70px + env(safe-area-inset-bottom,0px));left:0;right:0;background:none;display:block;padding:0 10px;pointer-events:none}
+#dlg .box{pointer-events:auto;max-width:560px;margin:0 auto;gap:10px;padding:10px 16px 16px;border:1px solid var(--line);border-top:4px solid var(--gold);border-radius:22px 22px 18px 18px;max-height:min(60vh,520px);overflow:auto;box-shadow:0 -12px 36px -10px rgba(42,28,110,.5),0 18px 36px -12px rgba(0,0,0,.25)}
+.grab{display:block;width:42px;height:4px;border-radius:9px;background:var(--line);margin:0 auto}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#dlg h2{margin:0;font-size:1.1em;color:var(--steel)}
+.x{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--mute);font-size:14px;cursor:pointer}
+#dlg .acts{margin-top:2px}
+#toast{top:calc(10px + env(safe-area-inset-top,0px));bottom:auto;max-width:560px;margin:0 auto;background:linear-gradient(135deg,#3a2a8c,#24175f);color:#fff;border-left:4px solid var(--gold);box-shadow:0 14px 30px -12px rgba(36,23,95,.8)}
+@media (prefers-reduced-motion:no-preference){
+#dlg .box{animation:sheetIn .4s cubic-bezier(.2,1.15,.4,1)}
+#toast{animation:toastDown .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes sheetIn{from{opacity:0;transform:translateY(70px)}to{opacity:1;transform:none}}
+@keyframes toastDown{from{opacity:0;transform:translateY(-30px) scale(.92)}to{opacity:1;transform:none}}
+}
+.tx{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(42,28,110,.06),0 10px 22px -16px rgba(42,28,110,.4)}
+.ico{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:21px;flex:none}
+.ico.ok{background:var(--okbg)}.ico.bad{background:var(--badbg)}
+.tb{flex:1;min-width:0}.tb>b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.amt{font-size:1.15em;white-space:nowrap}.amt.ok{color:var(--ok)}.amt.bad{color:var(--bad)}
+.sec .tag{margin-left:auto}
+.pbtn{display:inline-block;margin-top:6px;padding:6px 12px;min-height:34px;border-radius:99px;border:1px dashed var(--gold);background:var(--goldbg);color:var(--ink);font:600 .85em "Bricolage Grotesque",system-ui,sans-serif;cursor:pointer;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.pbtn:active{transform:scale(.93)}
+.pbtn.custom{border-style:solid;background:var(--gold);color:#241a00}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav id="nav"></nav><div id="dlg" hidden></div><div id="toast" role="status" hidden></div>
+<script>
+var KEY="tiffin-ledger-v1",S,tab="today",day=today();
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function load(){try{var r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return{price:80,cust:[],cooks:[],days:{},pays:[]}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){if(window.toast)toast("⚠️ Could not save. Storage may be full or blocked.")}}
+S=load();var DEFSET={name:"My Tiffin Service",cur:"₹",accent:"#e9a820",theme:"auto",size:17};S.set=Object.assign({},DEFSET,S.set||{});
+function pr(c){return S.price}
+function applySet(){document.title=S.set.name;var r=document.documentElement;r.style.setProperty("--gold",S.set.accent);r.style.setProperty("--fs",S.set.size+"px");if(S.set.theme==="auto")r.removeAttribute("data-theme");else r.setAttribute("data-theme",S.set.theme)}
+function setSet(k,x){S.set[k]=x;save();applySet();render()}
+var COL=["#e9a820","#c2274b","#0f8a6d","#2f5fd0","#7b3fe4","#d6336c"];
+function opts(a,cur){return a.map(function(o){return'<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>'}).join("")}
+function restore(){try{var o=JSON.parse(v("bk"));if(!o.cust)throw 0;S=o;S.set=Object.assign({},DEFSET,S.set||{});migrate();initMt();save();applySet();render()}catch(e){toast("That backup text is not valid.")}}
+function viewSet(){var s=S.set,h='<h1>Settings</h1><p class="sub">Make the app yours.</p>';
+h+='<div class="card form"><label>Business name<input value="'+esc(s.name)+'" onchange="setSet(\'name\',this.value.trim()||DEFSET.name)"></label><div class="grid2"><label>Currency symbol<input value="'+esc(s.cur)+'" maxlength="3" onchange="setSet(\'cur\',this.value||DEFSET.cur)"></label></div></div>';
+h+=mealsCard();h+='<div class="card form"><b>Look and feel</b><div class="acts">'+COL.map(function(c){return'<button class="b" aria-label="Colour '+c+'" style="background:'+c+';width:52px;border:'+(c===s.accent?'4px solid var(--ink)':'1px solid var(--line)')+'" onclick="setSet(\'accent\',\''+c+'\')"></button>'}).join("")+'</div><label>Light or dark<select onchange="setSet(\'theme\',this.value)">'+opts([["auto","Match my phone"],["light","Light"],["dark","Dark"]],s.theme)+'</select></label><label>Text size<select onchange="setSet(\'size\',+this.value)">'+opts([[15,"Small"],[17,"Normal"],[19,"Large"],[22,"Extra large"]],String(s.size)).replace('value="'+s.size+'"','value="'+s.size+'" selected')+'</select></label></div>';
+h+='<div class="card form"><b>Backup</b><span class="m">Tap Show my backup, copy the text and keep it safe. Paste it here later to restore.</span><textarea id="bk" rows="4" style="width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></textarea><div class="acts"><button class="b" onclick="document.getElementById(\'bk\').value=JSON.stringify(S)">Show my backup</button><button class="b pri" onclick="restore()">Restore from text</button><button class="b" onclick="wipe()">Erase everything</button></div></div>';
+return h}
+function esc(t){return String(t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function inr(n){return S.set.cur+Math.round(n).toLocaleString("en-IN")}
+function rows(d){return S.days[d]||(S.days[d]={})}
+function find(id){return S.cust.filter(function(c){return c.id===id})[0]}
+function v(i){return document.getElementById(i).value}
+function dateBar(){return '<div class="date"><input type="date" value="'+day+'" onchange="day=this.value||today();render()" aria-label="Date"><button class="b" onclick="day=today();render()">Today</button></div>'}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.hidden=false;t.style.animation="none";void t.offsetWidth;t.style.animation="";clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true},3500)}
+function ask(m,ok,cb){dlg(m,"",ok,function(){cb()})}
+function wipe(){ask("Erase ALL customers, cooks and records? This cannot be undone.","Erase everything",function(){S={price:80,meals:DEFMEALS(),cust:[],cooks:[],days:{},pays:[],set:Object.assign({},DEFSET)};initMt();save();applySet();render()})}
+var q="";
+function hit(c){var t=q.trim().toLowerCase(),d=t.replace(/\D/g,"");if(!t)return true;return c.name.toLowerCase().indexOf(t)>-1||(d!==""&&(c.phone||"").indexOf(d)>-1)}
+function searchBox(){return '<input type="search" id="q" placeholder="🔍 Search by name or phone number" value="'+esc(q)+'" oninput="q=this.value;upd()" aria-label="Search by name or phone number" style="margin-bottom:12px">'}
+function upd(){var l=document.getElementById("list");if(l)l.innerHTML=tab==="hist"?(document.getElementById("hs").innerHTML=histTiles(),histList()):tab==="cust"?custList():tab==="debt"?debtList():todayList()}
+var tabs=[["today","🍱","Today"],["cust","👥","Customers"],["debt","💸","Debt"],["hist","🧾","History"],["set","⚙️","Settings"]];
+function debtItems(){return S.cust.map(function(c){return{c:c,o:owed(c)}}).filter(function(x){return x.o>0}).sort(function(a,b){return b.o-a.o})}
+function debtList(){var h="";debtItems().filter(function(x){return hit(x.c)}).forEach(function(x){var c=x.c,old=c.due||0,u=x.o-old;
+ h+='<div class="card owes"><div class="row"><div><div class="name">'+esc(c.name)+'</div><div class="m"><a href="tel:'+esc(c.phone||"")+'">'+esc(c.phone||"No phone")+'</a></div></div><b style="font-size:1.4em;color:var(--bad)">'+inr(x.o)+'</b></div><div class="badges">'+(old>0?'<span class="tag bad">Old balance '+inr(old)+'</span>':'')+(u>0?'<span class="tag bad">Unpaid tiffins '+inr(u)+'</span>':'')+'</div><div class="acts"><button class="b gold big" onclick="debtFull(\''+c.id+'\')">✅ Receive full '+inr(x.o)+'</button><button class="b big" onclick="debtPart(\''+c.id+'\')">⚠️ Receive part</button></div></div>'});
+ return h||'<div class="empty">No one matches your search.</div>'}
+function viewDebt(){var L=debtItems(),t=0;L.forEach(function(x){t+=x.o});
+ var h='<h1>Debt</h1><p class="sub">Everyone who owes you money.</p><div class="stats"><div class="stat hot"><b>'+inr(t)+'</b><span>Total owed to you</span></div><div class="stat"><b>'+L.length+'</b><span>'+(L.length===1?'Person owes':'People owe')+' you</span></div></div>';
+ if(!L.length)return h+'<div class="empty">🎉 Nobody owes you anything.</div>';
+ return h+searchBox()+'<div id="list">'+debtList()+'</div>'}
+var mt="all";
+function DEFMEALS(){return[{id:"l",name:"Lunch",emoji:"☀️",price:80},{id:"e",name:"Dinner",emoji:"🌙",price:70}]}
+function migrate(){S.days=S.days||{};S.pays=S.pays||[];S.cust=S.cust||[];if(!S.meals||!S.meals.length){S.meals=DEFMEALS();S.meals[0].price=S.price||80;S.v2=1}
+ if(!S.v2){S.meals=S.meals.filter(function(m){return!(m.id==="b"&&m.name==="Breakfast")});S.meals.forEach(function(m){if(m.id==="e"&&m.name==="Evening")m.name="Dinner"});S.v2=1}
+ S.cust.forEach(function(c){if(!c.meals){c.meals={l:c.qty||0}}});
+ for(var d in S.days){var o=S.days[d];for(var k in o)if(k.indexOf("|")<0){o[k+"|l"]=o[k];o[k].m="l";delete o[k]}}
+ for(var d in S.days){var o=S.days[d],n=0;for(var k in o){var r=o[k];if(!r.qty&&!r.del&&!r.paid&&!r.short)delete o[k];else n++}if(!n)delete S.days[d]}}
+function mget(m){return S.meals.filter(function(z){return z.id===m})[0]}
+function mp(m){var x=mget(m);return x?x.price:(S.price||80)}
+function mn(m){var x=mget(m);return x?x.name:"Meal"}
+function me(m){var x=mget(m);return x&&x.emoji?x.emoji:"🍽️"}
+function row(d,c,m){var r=rows(d),k=c.id+"|"+m;if(!r[k]){var q=0;var pc=(c.prices&&c.prices[m])||0;r[k]={m:m,qty:q,del:false,paid:null,pr:pc,amt:q*(pc||mp(m))}}return r[k]}
+function unitK(k){var p=k.split("|");return{c:find(p[0]),m:p[1]}}
+function crows(c){var o=[];for(var d in S.days)for(var k in S.days[d])if(k.indexOf(c.id+"|")===0)o.push([d,S.days[d][k]]);return o}
+function owed(c){var t=c.due||0;crows(c).forEach(function(e){var r=e[1];if(r.del&&!r.paid)t+=r.amt});return t}
+function setQty(k,n){var u=unitK(k),r=row(day,u.c,u.m);if(r.paid)return toast("Undo the payment first to change the number of tiffins.");r.qty=Math.max(0,r.qty+n);if(!r.qty)r.del=false;r.amt=r.qty*up(r);fq=k;save();render()}
+function sums(){var s={need:0,del:0,on:0,cash:0,pend:0,debt:0};units().forEach(function(u){var x=u.r;s.need+=x.qty;if(x.del)s.del+=x.qty;if(x.late){}else if(x.paid==="online")s.on+=x.amt;else if(x.paid==="cash")s.cash+=x.amt;else if(x.qty)s.pend+=x.amt});
+ S.cust.forEach(function(c){s.debt+=owed(c)});if(mt==="all")S.pays.forEach(function(p){if(p.d===day){if(p.m==="online")s.on+=p.a;else s.cash+=p.a}});return s}
+function unpay(c,r){if(r.short){c.due=Math.max(0,(c.due||0)-r.short);r.short=0}r.amt=r.qty*up(r);r.paid=null;r.late=false}
+function askDeliver(k){var u=unitK(k),c=u.c,x=row(day,c,u.m);dlg("Confirm delivery",'<p style="margin:0">Was the '+me(u.m)+' <b>'+esc(mn(u.m))+'</b> delivered to <b>'+esc(c.name)+'</b>?</p><p class="m" style="margin:0">'+x.qty+' tiffin'+(x.qty===1?'':'s')+' · '+inr(x.amt)+'</p>',"Yes, delivered",function(){x.del=true;fx=k;save();render();toast("✓ Delivered to "+c.name);askPay(k);return false})}
+function cardT(u){var c=u.c,x=u.r,k=c.id+"|"+u.m,old=c.due||0,o=owed(c);
+ var h='<div class="card '+(x.del&&x.paid?"done":(o>0?"owes":""))+(fx===k?" pop":"")+'"><div class="row"><div><div class="name">'+esc(c.name)+'</div><div class="m"><b>'+me(u.m)+' '+esc(mn(u.m))+'</b> · '+(x.short?inr(x.amt+x.short)+' bill':inr(x.amt))+(old>0?' · old balance '+inr(old):'')+'</div><button class="pbtn'+(x.pr>0&&x.pr!==mp(u.m)?' custom':'')+'" onclick="priceSheet(\''+k+'\')">✏️ '+inr(up(x))+' each</button></div><div class="qty"><button aria-label="Fewer tiffins" onclick="setQty(\''+k+'\',-1)">−</button><span class="'+(fq===k?"bump":"")+'">'+x.qty+'</span><button aria-label="More tiffins" onclick="setQty(\''+k+'\',1)">+</button></div></div>';
+ if(!x.qty)return h+'</div>';
+ h+='<div class="badges">'+(x.del?'<span class="tag ok">🚚 Delivered</span>':'<span class="tag bad">⏳ Not delivered</span>')+(x.paid==="online"?'<span class="tag ok">📱 Paid online '+(x.short?inr(x.amt):'')+'</span>':x.paid==="cash"?'<span class="tag ok">💵 Paid cash '+(x.short?inr(x.amt):'')+'</span>':'<span class="tag bad">❌ Not paid</span>')+(x.short?'<span class="tag bad">'+inr(x.short)+' short, added to debt</span>':'')+(o>0?'<span class="tag bad">Owes '+inr(o)+' in total</span>':'')+'</div>';
+ h+='<div class="acts">'+(!x.del?'<button class="b pri big" onclick="askDeliver(\''+k+'\')">🚚 Mark delivered</button>':'<button class="b '+(x.paid?'':'gold')+'" onclick="askPay(\''+k+'\')">'+(x.paid?'💰 Change payment':'💰 Record payment')+'</button><button class="b" onclick="undoDel(\''+k+'\')">Undo delivery</button>')+'</div></div>';
+ return h}
+function sec(t,l){return l.length?'<h2 class="sec">'+t+' <span class="tag">'+l.length+'</span></h2>'+l.map(cardT).join(""):""}
+function todayList(){var A=[],B=[],C=[],D=[];units().filter(function(u){return hit(u.c)}).forEach(function(u){var x=u.r;if(!x.qty)D.push(u);else if(!x.del)A.push(u);else if(!x.paid)B.push(u);else C.push(u)});
+ return sec('🔴 Needs delivery',A)+sec('🟡 Delivered, waiting for payment',B)+sec('🟢 Done: delivered and paid',C)+sec('⚪ Not ordering today (tap + to add)',D)||'<div class="empty">Nothing to show. Pick a meal above and tap + beside a customer to add tiffins, or clear your search.</div>'}
+function viewToday(){var s=sums(),h='<h1>'+esc(S.set.name)+'</h1><p class="sub">Today\'s tiffins at a glance.</p>'+dateBar(),nA=0,n=0,np=0,nB=0;
+ h+='<div class="chips"><button class="chip '+(mt==="all"?'on':'')+'" onclick="mt=\'all\';render()">All meals</button>'+S.meals.map(function(m){return'<button class="chip '+(mt===m.id?'on':'')+'" onclick="mt=\''+m.id+'\';render()">'+me(m.id)+' '+esc(m.name)+'</button>'}).join("")+'</div>'+(mt!=="all"?'<div class="acts" style="margin:0 0 12px"><button class="b" onclick="copyYest()">📋 Copy '+esc(mn(mt))+' from yesterday</button></div>':'');
+ units().forEach(function(u){var x=u.r;if(x.qty){n++;if(!x.del)nA++;else if(!x.paid)nB++;if(x.paid)np++}});
+ h+='<div class="stats"><div class="stat gold"><b>'+s.need+'</b><span>Tiffins to make</span></div><div class="stat '+(n&&!nA?'good':'')+'"><b>'+(n-nA)+' of '+n+'</b><span>Deliveries done</span></div><div class="stat '+(n&&np===n?'good':'')+'"><b>'+np+' of '+n+'</b><span>Paid</span></div><div class="stat hot"><b>'+inr(s.pend)+'</b><span>Still to collect</span></div><div class="stat good"><b>'+inr(s.on)+'</b><span>Received online</span></div><div class="stat good"><b>'+inr(s.cash)+'</b><span>Received in cash</span></div></div>';
+ if(!S.cust.length)return h+'<div class="empty">No customers yet.<br><br><button class="b pri" onclick="tab=\'cust\';render()">Add your first customer</button></div>';
+ if(n&&!nA&&!nB)h+='<div class="banner">🎉 Everyone is delivered and paid</div>';
+ return h+searchBox()+'<div id="list">'+todayList()+'</div>'}
+function viewCust(){var h='<h1>Customers</h1><p class="sub">Just a name and a phone number. You choose the meals and the number of tiffins each day in the Today tab.</p><div class="card form"><b>Add a customer</b><label>Name (required)<input id="cn" placeholder="e.g. Ramesh"></label><label>Phone number (required)<input id="cp" inputmode="tel" placeholder="10-digit mobile number"></label>'+'<label>Money already owed (optional)<input id="cd" type="number" min="0" placeholder="0"></label><button class="b pri" onclick="addCust()">Add customer</button></div>';
+ if(!S.cust.length)return h+'<div class="empty">Customers you add will show up on the Today tab.</div>';
+ return h+searchBox()+'<div id="list">'+custList()+'</div>'}
+function custList(){var h="";S.cust.filter(hit).forEach(function(c){var o=owed(c),ms=S.meals.filter(function(m){return c.meals&&c.meals[m.id]>0}).map(function(m){return me(m.id)+' '+esc(m.name)+' ×'+c.meals[m.id]}).join(', ');
+ h+='<div class="card"><div class="row"><div><div class="name">'+esc(c.name)+'</div><div class="m">'+(c.phone?'<a href="tel:'+esc(c.phone)+'">'+esc(c.phone)+'</a>':'<b style="color:var(--bad)">Phone missing, tap Edit</b>')+'</div></div><div>'+(o>0?'<span class="tag bad">Owes '+inr(o)+'</span>':'<span class="tag ok">Clear</span>')+'</div></div><div class="acts"><button class="b" onclick="editCust(\''+c.id+'\')">Edit</button><button class="b" onclick="del(\'cust\',\''+c.id+'\')">Remove</button></div></div>'});
+ return h||'<div class="empty">No customer matches your search.</div>'}
+function addCust(){var n=v("cn").trim(),p=v("cp").replace(/[\s\-+]/g,"");if(!n)return toast("Enter the customer's name.");if(!/^\d{10,13}$/.test(p))return toast("Phone number is required. Enter a valid 10-digit number.");var dup=S.cust.filter(function(c){return ph10(c.phone||"")===ph10(p)})[0],dd=parseFloat(v("cd"))||0;if(dup)return dlg("Number already saved",'<p style="margin:0"><b>'+esc(dup.name)+'</b> already uses '+esc(p)+'. Add <b>'+esc(n)+'</b> with the same number?</p>',"Yes, add anyway",function(){addNow(n,p,dd)});addNow(n,p,dd)}
+function addNow(n,p,dd){S.cust.push({id:uid(),name:n,phone:p,due:dd});save();render();toast(n+" added")}
+function editCust(id){var c=find(id);dlg("Edit customer",'<label>Name<input id="en" value="'+esc(c.name)+'"></label><label>Phone number (required)<input id="ep" inputmode="tel" value="'+esc(c.phone||"")+'"></label>'+'<label>Old balance owed ('+esc(S.set.cur)+')<input id="ed" type="number" min="0" value="'+(c.due||0)+'"></label>',"Save",function(){var p=v("ep").replace(/[\s\-+]/g,"");if(!v("en").trim()||!/^\d{10,13}$/.test(p)){toast("Name and a valid phone number are required.");return false}var ed=Math.max(0,parseFloat(v("ed"))||0),nm=v("en").trim(),dup=S.cust.filter(function(x){return x!==c&&ph10(x.phone||"")===ph10(p)})[0];if(dup){dlg("Number already saved",'<p style="margin:0"><b>'+esc(dup.name)+'</b> already uses '+esc(p)+'. Save it for <b>'+esc(nm)+'</b> too?</p>',"Yes, save anyway",function(){c.name=nm;c.phone=p;c.due=ed;save();render()});return false}c.name=nm;c.phone=p;c.due=ed;save();render()})}
+function mealsCard(){var h='<div class="card form"><b>Meals and prices</b><span class="m">Each meal has its own price. A customer can get any mix of meals.</span>';
+ S.meals.forEach(function(m){h+='<div class="grid2"><label>Name<input value="'+esc(m.name)+'" onchange="editMeal(\''+m.id+'\',\'name\',this.value)"></label><label>Price ('+esc(S.set.cur)+')<input type="number" min="1" value="'+m.price+'" onchange="editMeal(\''+m.id+'\',\'price\',this.value)"></label></div>'+(S.meals.length>1?'<div class="acts"><button class="b" onclick="delMeal(\''+m.id+'\')">Remove '+esc(m.name)+'</button></div>':'')});
+ return h+'<b>Add a meal</b><div class="grid2"><label>Name<input id="nm" placeholder="e.g. Dinner"></label><label>Price<input id="np" type="number" min="1" placeholder="60"></label></div><button class="b pri" onclick="addMeal()">Add meal</button></div>'}
+function editMeal(id,k,x){var m=mget(id);if(k==="name"){x=x.trim();if(!x)return render();m.name=x}else{x=parseFloat(x);if(!(x>0)){toast("Enter a price above 0.");return render()}m.price=x;for(var d in S.days)for(var key in S.days[d]){var r=S.days[d][key];if(r.m===id&&!r.paid&&!(r.pr>0))r.amt=r.qty*x}}save();render();toast("Saved")}
+function addMeal(){var n=v("nm").trim(),p=parseFloat(v("np"));if(!n||!(p>0))return toast("Enter a meal name and a price.");S.meals.push({id:uid(),name:n,emoji:"🍽️",price:p});save();render();toast(n+" added")}
+function delMeal(id){var m=mget(id);ask("Remove "+esc(m.name)+"? Past records and debts stay, but it will no longer show on Today.","Remove meal",function(){S.meals=S.meals.filter(function(z){return z.id!==id});if(mt===id)mt="all";save();render()})}
+function units(){var a=[];S.cust.forEach(function(c){S.meals.forEach(function(m){if(mt!=="all"&&mt!==m.id)return;var e=S.days[day]&&S.days[day][c.id+"|"+m.id];if(mt==="all"&&!(e&&e.qty>0))return;a.push({c:c,m:m.id,r:e||{m:m.id,qty:0,del:false,paid:null,pr:(c.prices&&c.prices[m.id])||0,amt:0}})})});return a}
+function initMt(){var h=new Date().getHours(),n=S.meals.length;mt=S.meals[h<16?0:Math.min(1,n-1)].id}
+function copyYest(){var d=new Date(day+"T00:00:00");d.setDate(d.getDate()-1);var y=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),p=S.days[y],n=0;if(!p)return toast("No tiffins were recorded yesterday.");S.cust.forEach(function(c){var o=p[c.id+"|"+mt];if(o&&o.qty>0){var r=row(day,c,mt);if(!r.qty&&!r.del){r.qty=o.qty;r.pr=o.pr||0;r.amt=o.qty*up(r);n++}}});save();render();toast(n?"Copied "+n+" customer"+(n===1?"":"s")+" from yesterday":"Nothing new to copy.")}
+var RM=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches),fx=null,fq=null,rK="",bShown=false,pv=[],lp={x:innerWidth/2,y:innerHeight/2};
+document.addEventListener("pointerdown",function(e){lp={x:e.clientX,y:e.clientY};if(RM)return;var b=e.target.closest&&e.target.closest("button");if(b){var r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,i=document.createElement("i");i.className="rp";i.style.cssText="width:"+d+"px;height:"+d+"px;left:"+(e.clientX-r.left-d/2)+"px;top:"+(e.clientY-r.top-d/2)+"px";b.appendChild(i);setTimeout(function(){i.remove()},650)}},true);
+function burst(x,y,n){if(RM)return;var C=["#e9a820","#7b3fe4","#0f8a6d","#c2274b","#2f5fd0","#ffffff"];for(var i=0;i<n;i++){var p=document.createElement("i"),a=Math.random()*6.283,w=90+Math.random()*190,r=Math.random()*720;p.className="cf";p.style.cssText="left:"+x+"px;top:"+y+"px;background:"+C[i%6]+";width:"+(6+Math.random()*6)+"px;height:"+(8+Math.random()*8)+"px";document.body.appendChild(p);p.animate([{transform:"translate(0,0) rotate(0deg)",opacity:1},{transform:"translate("+Math.cos(a)*w+"px,"+(Math.sin(a)*w-90)+"px) rotate("+r+"deg)",opacity:1,offset:.5},{transform:"translate("+Math.cos(a)*w*1.25+"px,"+(Math.sin(a)*w+280)+"px) rotate("+(r*1.6)+"deg)",opacity:0}],{duration:1100+Math.random()*600,easing:"cubic-bezier(.2,.7,.3,1)"}).onfinish=(function(e){return function(){e.remove()}})(p)}}
+function roll(ch){document.querySelectorAll("#app .stat b").forEach(function(el,i){var m=el.textContent.match(/^([^\d]*)([\d,]+)([\s\S]*)$/);if(!m){pv[i]=null;return}var n=+m[2].replace(/,/g,""),f=(ch||pv[i]==null)?0:pv[i],pre=m[1],suf=m[3];pv[i]=n;if(f===n)return;var t0=performance.now();(function st(now){var p=Math.min(1,(now-t0)/750),e=1-Math.pow(1-p,3);el.textContent=pre+Math.round(f+(n-f)*e).toLocaleString("en-IN")+suf;if(p<1)requestAnimationFrame(st)})(t0)})}
+function enhance(ch){var app=document.getElementById("app");if(RM)return;if(ch){app.classList.add("enter");var i=0;app.querySelectorAll(".card,.stat,.chip,.banner,.sec,.tx").forEach(function(e){e.style.setProperty("--d",Math.min(i++,14)*45+"ms")})}else app.classList.remove("enter");roll(ch);var bn=app.querySelector(".banner");if(bn&&!bShown){bShown=true;if(!ch)burst(innerWidth/2,innerHeight*.3,44)}else if(!bn)bShown=false}
+function closeDlg(){document.getElementById("dlg").hidden=true;var w=document.querySelector&&document.querySelector(".wrap");if(w)w.style.paddingBottom=""}
+function dlg(title,body,ok,cb){var d=document.getElementById("dlg");d.innerHTML='<div class="box" role="dialog" aria-modal="false"><i class="grab"></i><div class="hd"><h2>'+title+'</h2><button class="x" id="dx" aria-label="Close">✕</button></div>'+body+'<div class="acts"><button class="b pri" id="dok">'+ok+'</button><button class="b" id="dno">Cancel</button></div></div>';d.hidden=false;var b=d.firstChild,w=document.querySelector&&document.querySelector(".wrap");if(w)w.style.paddingBottom=((b&&b.offsetHeight?b.offsetHeight:300)+130)+"px";var f=d.querySelector("input,select");if(f)f.focus({preventScroll:true});document.getElementById("dno").onclick=document.getElementById("dx").onclick=closeDlg;document.getElementById("dok").onclick=function(){if(cb()!==false)closeDlg()}}
+function debtFull(id){var c=find(id),t=owed(c);dlg("Receive full "+inr(t)+" from "+esc(c.name),'<p class="m" style="margin:0">How was it paid?</p><div class="acts"><button class="b pri big" onclick="settle(\''+id+'\',\'online\',\'full\')">📱 Online</button><button class="b pri big" onclick="settle(\''+id+'\',\'cash\',\'full\')">💵 Cash</button></div>',"Close",function(){})}
+function debtPart(id){var c=find(id),t=owed(c);dlg("Receive part from "+esc(c.name),'<label>Amount received ('+esc(S.set.cur)+')<input id="da" type="number" min="1" max="'+t+'" placeholder="e.g. '+Math.floor(t/2)+'"></label><p class="m" style="margin:0">Total owed: '+inr(t)+'. The rest stays as debt.</p><div class="acts"><button class="b pri big" onclick="settle(\''+id+'\',\'online\')">📱 Online</button><button class="b pri big" onclick="settle(\''+id+'\',\'cash\')">💵 Cash</button></div>',"Close",function(){})}
+function settle(id,mode,amt){var c=find(id),t=owed(c),a=amt==="full"?t:parseFloat(v("da"));if(!(a>0))return toast("Enter the amount received.");a=Math.min(a,t);
+ var left=a,k=Math.min(left,c.due||0);c.due=(c.due||0)-k;left-=k;var L=crows(c).filter(function(e){return e[1].del&&!e[1].paid&&e[1].amt>0});L.sort(function(x,y){return x[0]<y[0]?-1:1});
+ L.forEach(function(e){if(left<=0)return;var r=e[1];if(left>=r.amt){left-=r.amt;r.paid=mode;r.late=true}else{r.amt-=left;left=0}});
+ S.pays.push({d:today(),a:a,m:mode,id:id,t:Date.now()});save();closeDlg();render();burst(lp.x,lp.y,a>=t?34:12);toast("✓ "+inr(a)+" received from "+c.name+(a<t?" · "+inr(t-a)+" still owed":" · all clear"))}
+var hf="all",hr="week",hl=80;
+function ds(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function ago(n){var d=new Date();d.setDate(d.getDate()-n);return ds(d)}
+function dlabel(d){return d===today()?"Today":d===ago(1)?"Yesterday":new Date(d+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}
+function events(){var E=[];
+ for(var d in S.days)for(var k in S.days[d]){var r=S.days[d][k],p=k.split("|"),b={d:d,t:r.pt||0,c:find(p[0]),m:p[1],amt:r.amt};
+  if(r.paid&&!r.late)E.push({d:b.d,t:b.t,c:b.c,m:b.m,amt:b.amt,ty:"meal",mode:r.paid,short:r.short||0});
+  else if(!r.paid&&r.del&&r.amt>0)E.push({d:b.d,t:0,c:b.c,m:b.m,amt:b.amt,ty:"due"})}
+ S.pays.forEach(function(p){E.push({d:p.d,t:p.t||0,c:find(p.id),ty:"debt",mode:p.m,amt:p.a})});
+ return E.sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:b.t-a.t})}
+function hOK(e){if(hr!=="all"){var lo=hr==="today"?today():hr==="week"?ago(6):ago(29);if(e.d<lo)return false}
+ if(hf==="cash"&&(e.ty==="due"||e.mode!=="cash"))return false;if(hf==="online"&&(e.ty==="due"||e.mode!=="online"))return false;if(hf==="debt"&&e.ty!=="debt")return false;if(hf==="due"&&e.ty!=="due")return false;
+ return e.c?hit(e.c):!q.trim()}
+function txRow(e){var nm=e.c?esc(e.c.name):"Removed customer",tm=e.t?new Date(e.t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"}):"",ic,sub,amt,cls,md=e.mode==="online"?"Online":"Cash";
+ if(e.ty==="meal"){ic=e.mode==="online"?"📱":"💵";sub=me(e.m)+" "+esc(mn(e.m))+" · "+md;amt="+"+inr(e.amt);cls="ok"}
+ else if(e.ty==="debt"){ic="🧾";sub="Debt collected · "+md;amt="+"+inr(e.amt);cls="ok"}
+ else{ic="⏳";sub=me(e.m)+" "+esc(mn(e.m))+" · Delivered, not paid";amt=inr(e.amt);cls="bad"}
+ return'<div class="tx"><span class="ico '+cls+'">'+ic+'</span><div class="tb"><b>'+nm+'</b><div class="m">'+sub+(tm?" · "+tm:"")+'</div>'+(e.short?'<span class="tag bad">'+inr(e.short)+' short, added to debt</span>':'')+'</div><b class="amt '+cls+'">'+amt+'</b></div>'}
+function histTiles(){var L=events().filter(hOK),r=0,on=0,ca=0,du=0;L.forEach(function(e){if(e.ty==="due")du+=e.amt;else{r+=e.amt;if(e.mode==="online")on+=e.amt;else ca+=e.amt}});
+ return'<div class="stats"><div class="stat good"><b>'+inr(r)+'</b><span>Total received</span></div><div class="stat hot"><b>'+inr(du)+'</b><span>Delivered, not paid</span></div><div class="stat"><b>'+inr(on)+'</b><span>Online</span></div><div class="stat"><b>'+inr(ca)+'</b><span>Cash</span></div></div>'}
+function histList(){var L=events().filter(hOK),h="",cur="",tot={};if(!L.length)return'<div class="empty">No transactions match. Try another time range or filter.</div>';
+ L.forEach(function(e){if(e.ty!=="due")tot[e.d]=(tot[e.d]||0)+e.amt});
+ L.slice(0,hl).forEach(function(e){if(e.d!==cur){cur=e.d;h+='<h2 class="sec">'+dlabel(e.d)+'<span class="tag ok">'+inr(tot[e.d]||0)+' received</span></h2>'}h+=txRow(e)});
+ if(L.length>hl)h+='<button class="b big" style="width:100%" onclick="hl+=80;upd()">Show more ('+(L.length-hl)+' left)</button>';return h}
+function chipRow(a,cur,v){return'<div class="chips">'+a.map(function(o){return'<button class="chip '+(cur===o[0]?"on":"")+'" onclick="'+v+'=\''+o[0]+'\';hl=80;render()">'+o[1]+'</button>'}).join("")+'</div>'}
+function viewHist(){return'<h1>History</h1><p class="sub">Every payment and delivery, newest first.</p>'+chipRow([["today","Today"],["week","7 days"],["month","30 days"],["all","All time"]],hr,"hr")+chipRow([["all","All"],["cash","💵 Cash"],["online","📱 Online"],["debt","🧾 Debt collected"],["due","⏳ Not paid"]],hf,"hf")+'<div id="hs">'+histTiles()+'</div>'+searchBox()+'<div id="list">'+histList()+'</div><button class="b" style="width:100%;margin-top:10px" onclick="exportCSV()">📋 Export these entries</button>'}
+function up(r){return r.pr>0?r.pr:mp(r.m)}
+function priceSheet(k){var u=unitK(k),c=u.c,x=row(day,c,u.m);if(x.paid)return toast("Undo the payment first to change the price.");
+ dlg("Price for "+esc(c.name)+" · "+me(u.m)+" "+esc(mn(u.m)),'<label>Price per tiffin ('+esc(S.set.cur)+')<input id="pp" type="number" min="1" value="'+up(x)+'"></label><p class="m" style="margin:0">Normal price: '+inr(mp(u.m))+'. Choose how long this price applies.</p><div class="acts"><button class="b pri big" onclick="savePrice(\''+k+'\',0)">Today only</button><button class="b pri big" onclick="savePrice(\''+k+'\',1)">Always for '+esc(c.name)+'</button></div><button class="b" onclick="resetPrice(\''+k+'\')">↺ Use the normal price</button>',"Close",function(){})}
+function savePrice(k,always){var u=unitK(k),c=u.c,x=row(day,c,u.m),p=parseFloat(v("pp"));if(!(p>0))return toast("Enter a price above 0.");
+ x.pr=p;x.amt=x.qty*p;if(always){c.prices=c.prices||{};c.prices[u.m]=p}save();closeDlg();fx=k;render();toast("✓ "+c.name+" now pays "+inr(p)+" per tiffin"+(always?" from now on":" today"))}
+function resetPrice(k){var u=unitK(k),c=u.c,x=row(day,c,u.m);x.pr=0;x.amt=x.qty*mp(u.m);if(c.prices)delete c.prices[u.m];save();closeDlg();render();toast("Back to the normal price: "+inr(mp(u.m)))}
+function ph10(p){return String(p).slice(-10)}
+function bill(x){return x.amt+(x.short||0)}
+function askPay(k){var u=unitK(k),c=u.c,x=row(day,c,u.m);if(x.late)return toast("This was paid from the Debt tab, so it can't be changed here.");var b=bill(x);dlg("Payment from "+esc(c.name),'<p class="m" style="margin:0">'+me(u.m)+' '+esc(mn(u.m))+' · Bill '+inr(b)+(x.paid?' · now '+(x.paid==="online"?"online":"cash")+' '+inr(x.amt):'')+'</p><div class="acts" style="flex-direction:column"><button class="b pri big" onclick="payFull(\''+k+'\')">✅ Receive full money ('+inr(b)+')</button><button class="b big" onclick="payLess(\''+k+'\')">⚠️ Receive incomplete / do not receive</button></div>',x.paid?"Keep as it is":"Decide later",function(){})}
+function payFull(k){var u=unitK(k),x=row(day,u.c,u.m);dlg("Full money received: "+inr(bill(x)),'<p class="m" style="margin:0">How was it paid?</p><div class="acts"><button class="b pri big" onclick="setPay(\''+k+'\',\'online\',\'full\')">📱 Online</button><button class="b pri big" onclick="setPay(\''+k+'\',\'cash\',\'full\')">💵 Cash</button></div>',"Back",function(){askPay(k);return false})}
+function payLess(k){var u=unitK(k),x=row(day,u.c,u.m),b=bill(x);dlg("Incomplete payment",'<label>Amount received ('+esc(S.set.cur)+')<input id="pa" type="number" min="1" max="'+b+'" placeholder="e.g. '+Math.floor(b/2)+'"></label><p class="m" style="margin:0">Bill: '+inr(b)+'. The rest is added to their debt.</p><div class="acts"><button class="b pri big" onclick="setPay(\''+k+'\',\'online\')">📱 Online</button><button class="b pri big" onclick="setPay(\''+k+'\',\'cash\')">💵 Cash</button></div><button class="b" onclick="noPay(\''+k+'\')">🚫 Did not receive anything</button>',"Back",function(){askPay(k);return false})}
+function noPay(k){var u=unitK(k),x=row(day,u.c,u.m);if(x.paid||x.short)unpay(u.c,x);closeDlg();save();render();toast("Nothing received. "+inr(x.amt)+" stays as debt for "+u.c.name+".")}
+function setPay(k,mode,amt){var u=unitK(k),c=u.c,r=row(day,c,u.m),b=bill(r),a=amt==="full"?b:parseFloat(v("pa"));if(!(a>0))return toast("Enter the amount received, or tap Did not receive anything.");if(a>b)return toast("The bill is "+inr(b)+". Use the Debt tab to collect older money.");
+ if(r.paid||r.short)unpay(c,r);var sh=Math.round((r.amt-a)*100)/100;if(sh>0){c.due=(c.due||0)+sh;r.short=sh;r.amt=a}r.paid=mode;r.pt=Date.now();fx=k;save();closeDlg();render();burst(lp.x,lp.y,sh>0?10:28);toast("✓ "+inr(a)+" received "+(mode==="online"?"online":"in cash")+(sh>0?" · "+inr(sh)+" added to debt":""))}
+function undoDel(k){var u=unitK(k),c=u.c;if(row(day,c,u.m).late)return toast("This was settled from the Debt tab, so delivery can't be undone here.");ask("Undo delivery for "+esc(c.name)+" ("+esc(mn(u.m))+")? This also clears its payment.","Undo delivery",function(){var r=row(day,c,u.m);unpay(c,r);r.del=false;save();render()})}
+function del(kind,id){var c=find(id),o=c?owed(c):0;ask("Remove "+esc(c?c.name:"this customer")+"?"+(o>0?" They still owe "+inr(o)+", which will be lost.":""),"Remove",function(){S.cust=S.cust.filter(function(x){return x.id!==id});save();render()})}
+function exportCSV(){var L=events().filter(hOK),R2=[["Date","Time","Customer","Phone","Type","Meal","Mode","Amount"]];L.forEach(function(e){R2.push([e.d,e.t?new Date(e.t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"}):"",e.c?e.c.name:"Removed customer",e.c?e.c.phone||"":"",e.ty==="meal"?"Payment":e.ty==="debt"?"Debt collected":"Not paid",e.m?mn(e.m):"",e.ty==="due"?"":(e.mode==="online"?"Online":"Cash"),e.amt])});
+ var t=R2.map(function(r){return r.map(function(x){return'"'+String(x).replace(/"/g,'""')+'"'}).join(",")}).join("\n");
+ dlg("Export "+L.length+" entries",'<textarea id="csv" rows="6" readonly style="width:100%;font:inherit;font-size:.8em;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></textarea><p class="m" style="margin:0">Tap Copy, then paste into WhatsApp, Notes or a spreadsheet.</p>',"Copy",function(){var a=document.getElementById("csv");a.select();try{document.execCommand("copy");toast("Copied to clipboard")}catch(e){toast("Select the text and copy it manually")}return false});document.getElementById("csv").value=t}
+function render(){var f={today:viewToday,cust:viewCust,debt:viewDebt,hist:viewHist,set:viewSet};
+ var a=document.activeElement&&document.activeElement.id;
+ var key=tab+"|"+mt+"|"+day,ch=key!==rK;document.getElementById("app").innerHTML=f[tab]();
+ document.getElementById("nav").innerHTML=tabs.map(function(t){return'<button class="'+(t[0]===tab?'on'+(ch&&rK?' hop':''):'')+'" onclick="tab=\''+t[0]+'\';q=\'\';render();scrollTo(0,0)">'+'<span style="display:block;font-size:22px">'+t[1]+'</span>'+t[2]+'</button>'}).join("");enhance(ch);rK=key;fx=null;fq=null}
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeDlg()});
+migrate();initMt();applySet();render();
+</script>
+</body>
+</html>
